@@ -1,5 +1,6 @@
 "use client";
 
+import { auth } from "@/lib/firebase";
 import { useUserStore } from "@/store/userStore";
 import {
   Disclosure,
@@ -11,8 +12,10 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const navigation = [{ name: "Feed", href: "/auth/feed", current: true }];
 
@@ -23,26 +26,24 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const { logout } = useUserStore();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false); // ✅ Add mounted state
+  const [mounted, setMounted] = useState(false);
 
-  // ✅ Wait for client-side hydration
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut(auth);
     logout();
     router.push("/login");
+    toast.success("Logged out successfully");
   };
 
-  // ✅ Don't render until mounted (prevents hydration mismatch)
   if (!mounted) {
     return (
       <nav className="relative bg-gray-800 dark:bg-gray-800/50 dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:bottom-0 dark:after:h-px dark:after:bg-white/10">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between">
-            {/* Empty placeholder during SSR */}
-          </div>
+          <div className="relative flex h-16 items-center justify-between"></div>
         </div>
       </nav>
     );
@@ -56,7 +57,6 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            {/* Mobile menu button*/}
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
