@@ -34,7 +34,7 @@ export default function Login() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Handle successful login
-      router.replace("/feed");
+      router.replace("auth/feed");
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
