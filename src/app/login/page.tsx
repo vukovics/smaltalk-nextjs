@@ -1,10 +1,12 @@
 "use client";
 
+import { loginWithEmail } from "@/lib/authService";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -26,20 +28,17 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    console.log("Login attempt with:", { email, password });
-
     try {
-      // Replace this with your actual authentication logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await loginWithEmail(email, password);
 
-      // Handle successful login
-      router.replace("auth/feed");
+      router.replace("/auth/feed");
     } catch (error) {
+      toast.error("Login failed");
       console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
     }
+    s;
   };
 
   return (
