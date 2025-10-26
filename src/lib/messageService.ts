@@ -10,6 +10,7 @@ import {
   Timestamp,
   doc,
   updateDoc,
+  increment,
 } from "firebase/firestore";
 
 export interface Message {
@@ -19,6 +20,7 @@ export interface Message {
   updatedAt: Timestamp;
   userId: string;
   userDisplayName: string;
+  likes: number;
 }
 
 export interface MessageInput {
@@ -84,6 +86,20 @@ export async function updateMessageFirebase(
     await updateDoc(docRef, { message });
   } catch (error) {
     console.error("Error updating message:", error);
+    throw error;
+  }
+}
+
+export async function addLikeToMessage(messageId: string): Promise<void> {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("User must be logged in to like a message");
+  }
+  try {
+    const docRef = doc(db, "messages", messageId);
+    await updateDoc(docRef, { likes: increment(1) });
+  } catch (error) {
+    console.error("Error adding like to message:", error);
     throw error;
   }
 }

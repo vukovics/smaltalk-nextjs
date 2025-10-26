@@ -1,6 +1,10 @@
 import { auth } from "@/lib/firebase";
-import { Message, updateMessageFirebase } from "@/lib/messageService";
-import { PencilIcon } from "@heroicons/react/16/solid";
+import {
+  addLikeToMessage,
+  Message,
+  updateMessageFirebase,
+} from "@/lib/messageService";
+import { HeartIcon, PencilIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -33,6 +37,17 @@ export default function RecentMessages({
       console.error("Error updating message:", error);
     } finally {
       setIsEditing(false);
+    }
+  };
+
+  const likeMessage = async () => {
+    try {
+      await addLikeToMessage(message.id);
+      toast.success("Message liked successfully");
+      onMessageUpdated?.();
+    } catch (error) {
+      toast.error("Error liking message");
+      console.error("Error liking message:", error);
     }
   };
 
@@ -69,6 +84,15 @@ export default function RecentMessages({
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {message.createdAt.toDate().toLocaleString()}
           </div>
+        </div>
+        <HeartIcon
+          onClick={likeMessage}
+          className={`w-4 h-4 text-red-500 cursor-pointer ${
+            message.likes > 0 ? "text-red-500" : "text-gray-500"
+          }`}
+        />
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {message.likes > 0 ? `${message.likes} likes` : "No likes yet"}
         </div>
       </div>
     </div>
